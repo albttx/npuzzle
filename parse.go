@@ -1,9 +1,9 @@
 package npuzzle
 
 import (
-	"flag"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -25,33 +25,12 @@ func fillLineInBoard(line string, greed *[]int) {
 	if len(raw) != boardSize {
 		log.Fatal("MAP ERROR: Different size")
 	}
-	for i, e := range raw {
+	for _, e := range raw {
 		val, err := strconv.Atoi(e)
 		if err != nil {
 			log.Fatal("Atoi error converting line")
 		}
-		if i >= boardSize {
-			log.Fatal("Line too big for boardSize")
-		}
 		*greed = append(*greed, val)
-	}
-}
-
-func setFinalState() {
-	finalState = make([]int, boardSize*boardSize)
-	i := 0
-	if flag.Lookup("linear").Value.(flag.Getter).Get().(bool) {
-		for i = 0; i < boardSize*boardSize; i++ {
-			finalState[i] = i + 1
-		}
-		finalState[i-1] = 0
-		return
-	}
-	for y := 0; y < boardSize; y++ {
-		for x := 0; x < boardSize; x++ {
-			finalState[i] = getValueInBoard(boardSize, y, x)
-			i++
-		}
 	}
 }
 
@@ -75,6 +54,15 @@ func fillBoard(file string) []int {
 				fillLineInBoard(line, &greed)
 			}
 			y++
+		}
+	}
+
+	sortGreed := make([]int, boardSize*boardSize)
+	copy(sortGreed, greed)
+	sort.Ints(sortGreed)
+	for i, val := range sortGreed {
+		if val != i {
+			log.Fatal("Duplicate value")
 		}
 	}
 	return greed

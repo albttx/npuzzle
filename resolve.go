@@ -37,7 +37,6 @@ func aStarSearch(greed []int) (*Board, int, int) {
 			break
 		}
 
-		//statesChan := make(chan Board)
 		// 3. Get all the possible states in which puzzle can be.
 		go getStates(curr, level, statesChan)
 
